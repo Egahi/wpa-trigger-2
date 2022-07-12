@@ -1,41 +1,43 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Management;
+using System.Windows;
 
 namespace wpa_trigger_2
 {
     internal class Program
     {
+        const string WPA = "wpa.exe";
+        const string WPA_NOT_FOUND_CAPTION = "WPA not found!";
+        const string WPA_NOT_FOUND_ERROR_MESSAGE =
+            "Windows Performance Analyzer (WPA) not found. " +
+            "Kindly install it from the Microsoft store.";
+
         static void Main(string[] args)
         {
-            // Test run
             Console.WriteLine("Hello wpa-trigger!");
-            // Process.Start("notepad.exe", "README.txt");
 
-            var startInfo = new ProcessStartInfo();
-            //startInfo.UseShellExecute = false;
-
-            // Get path to "ProgramFiles"
-            //string programFilesPath = startInfo.EnvironmentVariables["ProgramW6432"];
-
-            //// fail safe, just in case the "ProgramW6432" environment variable is not set for some reason
-            //if (String.IsNullOrEmpty(programFilesPath))
-            //{
-            //    programFilesPath = startInfo.EnvironmentVariables["PROGRAMFILES"];
-            //}
-
-            startInfo.Arguments = "";
-            //startInfo.FileName = @"C:\Program Files\WindowsApps\Microsoft.WindowsPerformanceAnalyzerInternal_10.0.22549.0_x64__8wekyb3d8bbwe\10\Windows Performance Toolkit (Microsoft-Internal)\wpa.exe";
-            //startInfo.FileName = @"C:\Program Files\WindowsApps\Microsoft.WindowsPerformanceAnalyzer_10.0.22621.0_x64__8wekyb3d8bbwe\10\Windows Performance Toolkit\wpa.exe";
-            //startInfo.FileName = programFilesPath + @"\WindowsApps\Microsoft.WindowsPerformanceAnalyzer_10.0.22621.0_x64__8wekyb3d8bbwe\10\Windows Performance Toolkit\wpa.exe";
-            startInfo.FileName = "wpa.exe";
-            startInfo.WindowStyle = ProcessWindowStyle.Normal;
-
-            using (var wpaProcess = Process.Start(startInfo))
+            var startInfo = new ProcessStartInfo()
             {
-                wpaProcess.WaitForExit();
+                Arguments = "",
+                FileName = WPA,
+                WindowStyle = ProcessWindowStyle.Normal
+            };
 
-                int exitCode = wpaProcess.ExitCode;
+            try
+            {
+                using (var wpaProcess = Process.Start(startInfo))
+                {
+                    wpaProcess.WaitForExit();
+
+                    int exitCode = wpaProcess.ExitCode;
+                }
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine(e.ToString());
+
+                MessageBox.Show(WPA_NOT_FOUND_ERROR_MESSAGE, WPA_NOT_FOUND_CAPTION,
+                    MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
             Console.WriteLine("Goodbye wpa-trigger.");
