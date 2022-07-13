@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Specialized;
+using System.Deployment.Application;
 using System.Diagnostics;
+using System.Web;
 using System.Windows;
 
 namespace wpa_trigger_2
@@ -15,6 +18,13 @@ namespace wpa_trigger_2
         static void Main(string[] args)
         {
             Console.WriteLine("Hello wpa-trigger!");
+
+            var queryStrings = GetQueryStringParameters();
+
+            foreach (var key in queryStrings.Keys)
+            {
+                Console.WriteLine(key);
+            }
 
             var startInfo = new ProcessStartInfo()
             {
@@ -41,6 +51,24 @@ namespace wpa_trigger_2
             }
 
             Console.WriteLine("Goodbye wpa-trigger.");
+        }
+
+        /// <summary>
+        /// Get Query String Parameters
+        /// Credit - https://docs.microsoft.com/en-us/visualstudio/deployment/how-to-retrieve-query-string-information-in-an-online-clickonce-application?view=vs-2022&tabs=csharp#to-obtain-query-string-information-from-a-clickonce-application
+        /// </summary>
+        /// <returns></returns>
+        private static NameValueCollection GetQueryStringParameters()
+        {
+            NameValueCollection nameValueTable = new NameValueCollection();
+
+            if (ApplicationDeployment.IsNetworkDeployed)
+            {
+                string queryString = ApplicationDeployment.CurrentDeployment.ActivationUri.Query;
+                nameValueTable = HttpUtility.ParseQueryString(queryString);
+            }
+
+            return (nameValueTable);
         }
     }
 }
